@@ -1,0 +1,147 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.9;
+
+abstract contract Context {
+    function _msgSender() internal view virtual returns (address) {
+        return msg.sender;
+    }
+
+    function _msgData() internal view virtual returns (bytes calldata) {
+        return msg.data;
+    }
+
+    function _contextSuffixLength() internal view virtual returns (uint256) {
+        return 0;
+    }
+}
+
+abstract contract Ownable is Context {
+    address private _owner;
+
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    
+    constructor() {
+        _transferOwnership(_msgSender());
+    }
+
+    modifier onlyOwner() {
+        _checkOwner();
+        _;
+    }
+
+    function owner() public view virtual returns (address) {
+        return _owner;
+    }
+
+    function _checkOwner() internal view virtual {
+        require(owner() == _msgSender(), "Ownable: caller is not the owner");
+    }
+
+    function renounceOwnership() public virtual onlyOwner {
+        _transferOwnership(address(0));
+    }
+
+    function transferOwnership(address newOwner) public virtual onlyOwner {
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        _transferOwnership(newOwner);
+    }
+
+    function _transferOwnership(address newOwner) internal virtual {
+        address oldOwner = _owner;
+        _owner = newOwner;
+        emit OwnershipTransferred(oldOwner, newOwner);
+    }
+}
+
+interface IERC20 {
+    function totalSupply() external view returns (uint256);
+    function balanceOf(address account) external view returns (uint256);
+    function transfer(address recipient, uint256 amount) external returns (bool);
+    function allowance(address owner, address spender) external view returns (uint256);
+    function approve(address spender, uint256 amount) external returns (bool);
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+}
+
+contract TokenDrop is Ownable {
+    IERC20 public stakingToken;
+    mapping(address => bool) public hasClaimed; // Menyimpan status klaim token
+    
+    // Add reentrancy protection
+    bool private _locked;
+    
+    event Claimed(address indexed user, uint256 amount);
+    event TokensDeposited(address indexed depositor, uint256 amount);
+    event TokensWithdrawn(address indexed withdrawer, uint256 amount);
+
+    modifier nonReentrant() {
+        require(!_locked, "ReentrancyGuard: reentrant call");
+        _locked = true;
+        _;
+        _locked = false;
+    }
+
+    constructor(address _stakingToken) {
+        require(_stakingToken != address(0), "Invalid token address");
+        stakingToken = IERC20(_stakingToken);
+    }
+
+    // Fungsi untuk klaim staking token
+    function claimToken() external nonReentrant {
+        require(!hasClaimed[msg.sender], "You have already claimed");
+        
+        // Mark as claimed before external call (checks-effects-interactions pattern)
+        hasClaimed[msg.sender] = true;
+        
+        // Save the amount in a local variable for consistency and gas savings
+        uint256 claimAmount = 1 * (10 ** 18); // 1 token with 18 decimals
+        
+        // Check contract has enough balance
+        require(stakingToken.balanceOf(address(this)) >= claimAmount, "Insufficient token balance");
+        
+        // Emit event before the external call
+        emit Claimed(msg.sender, claimAmount);
+        
+        // Make the external call last
+        bool success = stakingToken.transfer(msg.sender, claimAmount);
+        require(success, "Token transfer failed");
+    }
+
+    // Fungsi untuk owner mengisi kontrak dengan staking token
+    function depositTokens(uint256 _amount) external onlyOwner nonReentrant {
+        require(_amount > 0, "Amount must be greater than zero");
+        
+        // Save current balance to verify later
+        uint256 balanceBefore = stakingToken.balanceOf(address(this));
+        
+        // Make the external call
+        bool success = stakingToken.transferFrom(msg.sender, address(this), _amount);
+        require(success, "Token transfer failed");
+        
+        // Verify the transfer completed as expected
+        uint256 balanceAfter = stakingToken.balanceOf(address(this));
+        require(balanceAfter >= balanceBefore + _amount, "Token deposit verification failed");
+        
+        emit TokensDeposited(msg.sender, _amount);
+    }
+
+    // Fungsi untuk owner menarik token jika ada sisa
+    function withdrawTokens(uint256 _amount) external onlyOwner nonReentrant {
+        require(_amount > 0, "Amount must be greater than zero");
+        require(stakingToken.balanceOf(address(this)) >= _amount, "Insufficient token balance");
+        
+        // Emit event before the external call
+        emit TokensWithdrawn(msg.sender, _amount);
+        
+        // Make the external call last
+        bool success = stakingToken.transfer(msg.sender, _amount);
+        require(success, "Token transfer failed");
+    }
+
+    // Fungsi untuk melihat total supply token yang ada di dalam kontrak
+    function getDepositedSupply() external view returns (uint256) {
+        return stakingToken.balanceOf(address(this));
+    }
+}

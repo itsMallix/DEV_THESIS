@@ -1,0 +1,13 @@
+bg - #24273A
+bg darker - #1E2030
+bg darkest - #181926 
+purple - #C6A0F6
+l purple - #B7BDF8
+orange - #F5A97F
+green - #A6DA95
+yellow - #EED49F
+blue - #7DC4E4
+red - #ED8796
+pink - #F5BDE6
+white - #CAD3F5 
+bg light - #363A4F

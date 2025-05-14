@@ -1,0 +1,101 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.9;
+
+contract Crowdfunding {
+    struct Campaign {
+        address owner; 
+        string nameOwner; 
+        string instagram; 
+        string twitter; 
+        string telegram; 
+        string title; 
+        string description; 
+        uint256 target; 
+        uint256 deadline; 
+        uint256 amountCollected; 
+        string image; 
+        address[] donators; 
+        uint256[] donations;
+        bool isActive;
+    }
+
+    mapping(uint256 => Campaign) public campaigns; 
+
+    uint256 public numberOfCampaigns = 0; 
+    
+    event CampaignStatusChanged(uint256 indexed campaignId, bool isActive);
+    event DonationReceived(uint256 indexed campaignId, address donor, uint256 amount);
+
+    function createCampaign( 
+        address _owner,  
+        string memory _nameOwner,
+        string memory _instagram,
+        string memory _twitter,
+        string memory _telegram,
+        string memory _title,  
+        string memory _description, 
+        uint256 _target, 
+        uint256 _deadline, 
+        string memory _image 
+    ) public returns (uint256) {
+        require(_deadline > block.timestamp, "The deadline should be a date in the future"); 
+
+        Campaign storage campaign = campaigns[numberOfCampaigns]; 
+        campaign.owner = _owner;
+        campaign.nameOwner = _nameOwner;
+        campaign.instagram = _instagram;
+        campaign.twitter = _twitter;
+        campaign.telegram = _telegram;
+        campaign.title = _title;
+        campaign.description = _description;
+        campaign.target = _target;
+        campaign.deadline = _deadline;
+        campaign.amountCollected = 0;
+        campaign.image = _image;
+        campaign.isActive = true;
+
+        numberOfCampaigns++;
+
+        return numberOfCampaigns - 1;
+    }
+
+    function donateToCampaign(uint256 _id) public payable {
+        uint256 amount = msg.value;
+        Campaign storage campaign = campaigns[_id];
+
+        require(campaign.isActive, "Campaign is not active");
+        
+        if (block.timestamp >= campaign.deadline) {
+            campaign.isActive = false;
+            emit CampaignStatusChanged(_id, false);
+            revert("Campaign has ended");
+        }
+        
+        require(amount > 0, "Donation must be greater than zero");
+
+        campaign.donators.push(msg.sender);
+        campaign.donations.push(amount);
+        
+        campaign.amountCollected += amount;
+        
+        emit DonationReceived(_id, msg.sender, amount);
+
+        (bool sent,) = payable(campaign.owner).call{value: amount}("");
+        require(sent, "Failed to send donation to campaign owner");
+    }
+    
+    function getDonators(uint256 _id) public view returns (address[] memory, uint256[] memory) {
+        return (campaigns[_id].donators, campaigns[_id].donations);
+    }
+
+    function getCampaigns() public view returns (Campaign[] memory) {
+        Campaign[] memory allCampaigns = new Campaign[](numberOfCampaigns);
+
+        for (uint256 i = 0; i < numberOfCampaigns; i++) {
+            Campaign storage item = campaigns[i];
+            allCampaigns[i] = item;
+        }
+
+        return allCampaigns;
+    }
+}
