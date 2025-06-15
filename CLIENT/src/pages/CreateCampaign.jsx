@@ -39,7 +39,8 @@ const CreateCampaign = () => {
           ...form, 
           target: ethers.utils.parseUnits(form.target, 18) 
         });
-      
+
+        console.log(form);
         setIsLoading(false);
         navigate('/');
       } else {
@@ -136,7 +137,7 @@ const CreateCampaign = () => {
               btnType="submit"
               title="Submit new campaign"
               styles="bg-[#A6DA95] text-[#24273A]"
-            />
+              />
           </div>
       </form>
     </div>

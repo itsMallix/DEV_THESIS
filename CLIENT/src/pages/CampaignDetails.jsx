@@ -69,6 +69,10 @@ const CampaignDetails = () => {
                 <div className="flex-[2] flex flex-col gap-[40px]">
 
                     <div>
+                        <h4 className="font-epilogue font-semibold text-[18px] text-[#CAD3F5] uppercase">{state.title}</h4>
+                    </div>
+
+                    <div>
                         <h4 className="font-epilogue font-semibold text-[18px] text-[#CAD3F5] uppercase">Creator</h4>
                         <div className="mt-[20px] flex flex-row items-center flex-wrap gap-[14px]">
                             <div className="w-[52px] h-[52px] flex items-center justify-center rounded-full bg-[#363A4F] cursor-pointer">
