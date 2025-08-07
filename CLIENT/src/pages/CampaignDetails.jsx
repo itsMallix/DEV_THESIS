@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ethers } from 'ethers';
 
-import { useStateContext } from '../context';
-import { CustomButton, CountBox, Loader } from '../components';
-import { calculateBarPercentage, daysLeft } from '../utils';
 import { metamask } from '../assets';
+import { CountBox, CustomButton, Loader } from '../components';
+import { useStateContext } from '../context';
+import { calculateBarPercentage, daysLeft } from '../utils';
 
 const CampaignDetails = () => {
     const navigate = useNavigate();
@@ -70,6 +69,41 @@ const CampaignDetails = () => {
 
                     <div>
                         <h4 className="font-epilogue font-semibold text-[18px] text-[#CAD3F5] uppercase">{state.title}</h4>
+                    </div>
+
+                    <div>
+                        <div className="flex flex-wrap gap-4">
+                            {state.instagram && (
+                                <a
+                                    href={`https://www.instagram.com/${state.instagram}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="py-2 px-4 bg-[#3a3a43] text-white rounded-lg hover:bg-[#A66AFF] transition"
+                                >
+                                    Instagram
+                                </a>
+                            )}
+                            {state.twitter && (
+                                <a
+                                    href={`https://twitter.com/${state.twitter}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="py-2 px-4 bg-[#3a3a43] text-white rounded-lg hover:bg-[#1DA1F2] transition"
+                                >
+                                    Twitter
+                                </a>
+                            )}
+                            {state.telegram && (
+                                <a
+                                    href={`https://t.me/${state.telegram}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="py-2 px-4 bg-[#3a3a43] text-white rounded-lg hover:bg-[#0088CC] transition"
+                                >
+                                    Telegram
+                                </a>
+                            )}
+                        </div>
                     </div>
 
                     <div>

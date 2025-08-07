@@ -10,17 +10,17 @@
   },
   "dependencies": {
     "@thirdweb-dev/react": "^3",
-    "@thirdweb-dev/sdk": "^3",
+    "@thirdweb-dev/sdk": "^4.0.99",
     "ethers": "^5.7.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.4.4"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^2",
+    "@vitejs/plugin-react": "^4.7.0",
     "autoprefixer": "^10.4.13",
     "postcss": "^8.4.19",
     "tailwindcss": "^3.2.4",
-    "vite": "^3"
+    "vite": "^7.0.6"
   }
 }

@@ -86,8 +86,6 @@ hex_data = "0xda52d95f0000000000000000000000004493955ff6ad5d5e921f0da2bd1b583441
 
 # Decode the data
 result = decode_hex_data(hex_data)
-
-# Print in the requested format
 print(f"owner: {result['owner']}")
 print(f"target: {result['target']}")
 print(f"deadline: {result['deadline']}")
