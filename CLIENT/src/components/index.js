@@ -9,3 +9,4 @@ export { default as Loader } from './Loader';
 export { default as StakingTokenCard } from './StakingTokenCard';
 export { default as RewardTokenCard } from './RewardTokenCard';
 export { default as TokenDropCard } from './TokenDropCard';
+export { default as HelpButton } from './HelpButton';
