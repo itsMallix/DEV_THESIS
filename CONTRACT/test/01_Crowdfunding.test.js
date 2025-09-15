@@ -1,6 +1,6 @@
 const { expect } = require("chai");
-const { ethers } = require("ethers"); // ✅ Benar
-const { ethers: hardhatEthers } = require("hardhat"); // Gunakan ini untuk getSigners
+const { ethers } = require("ethers"); // 
+const { ethers: hardhatEthers } = require("hardhat");
 
 
 describe("Crowdfunding", function () {
