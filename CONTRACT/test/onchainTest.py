@@ -6,10 +6,6 @@ def decode_hex_data(hex_string):
     # Convert hex to bytes
     data = bytes.fromhex(hex_string)
     
-    # Parse the data according to ABI encoding rules
-    # First 4 bytes are function selector (skip for this case)
-    # Next 32 bytes chunks contain the actual data
-    
     def read_uint256(data, offset):
         return int.from_bytes(data[offset:offset+32], 'big')
     
